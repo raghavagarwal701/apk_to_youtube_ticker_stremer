@@ -54,13 +54,19 @@ class SimpleMatchClient:
 
 
 
-async def get_score_websocket_and_get_image(match_id):
-    print("here")
+def get_score_websocket_and_get_image(match_id):
+    asyncio.run(main(match_id))
+        
+        
+        
+        
+        
+async def main(match_id):
+    # Example usage
     base_url = "https://qa.gully6.com"
     guest_user_id = "your_guest_id"  # Replace with your guest ID
 
     client = SimpleMatchClient(base_url, match_id, guest_user_id)
-    
     try:
         await client.connect()
         # Keep connection alive
@@ -69,32 +75,7 @@ async def get_score_websocket_and_get_image(match_id):
         print("\nShutting down...")
     finally:
         await client.disconnect()
-        
-    # Read the data from the file
-    with open("match_data.json", "r") as f:
-        data = json.load(f)
-        
-        
-        
-        
-        
-async def main():
-    # Example usage
-    # base_url = "https://qa.gully6.com"
-    # match_id = input("Enter match ID: ") 
-    # guest_user_id = "your_guest_id"  # Replace with your guest ID
 
-    # client = SimpleMatchClient(base_url, match_id, guest_user_id)
-    
-    # try:
-    #     await client.connect()
-    #     # Keep connection alive
-    #     await asyncio.sleep(7200)  # Run for 1 hour
-    # except KeyboardInterrupt:
-    #     print("\nShutting down...")
-    # finally:
-    #     await client.disconnect()
-    await get_score_websocket_and_get_image("ilim6xty3")
 
 if __name__ == "__main__":
     asyncio.run(main())
