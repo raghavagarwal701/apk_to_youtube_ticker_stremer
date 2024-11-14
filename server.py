@@ -22,7 +22,7 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
 
     while not stop_event.is_set():
         # Generate the overlay image
-        img = Image.open(('score_image.png'))
+        img = Image.open('score_image.png')
         overlay_image = f"{stream_name}.png"
         img.save(overlay_image)
 
@@ -38,20 +38,32 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
             youtube_url
         ]
 
-        process = subprocess.Popen(ffmpeg_command)
+        process_ffmpeg = subprocess.Popen(ffmpeg_command)
 
-        main(stream_name)
+        # Start a separate thread or process for the score fetching
+        def fetch_score():
+            match_id = stream_name
+            while not stop_event.is_set():
+                get_score_websocket_and_get_image(match_id)
+
+        score_thread = threading.Thread(target=fetch_score)
+        score_thread.start()
+
         while not stop_event.is_set():
-            if process.poll() is not None:
+            if process_ffmpeg.poll() is not None:
                 print(f"FFmpeg process for stream {stream_name} has ended unexpectedly.")
                 break
-            # main(stream_name)
+
+            # Wait and generate the next overlay image (if needed)
             overlay_image = f"{stream_name}.png"
             time.sleep(100)  # Wait for 1 second before generating the next overlay image
 
-        if process.poll() is None:
-            process.terminate()
-            process.wait()
+        # Clean up when the stream is stopped
+        if process_ffmpeg.poll() is None:
+            process_ffmpeg.terminate()
+            process_ffmpeg.wait()
+
+        score_thread.join()  # Ensure the score-fetching thread finishes
 
     print(f"Stream {stream_name} stopped")
 
