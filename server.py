@@ -16,6 +16,13 @@ RTMP_SERVER = "rtmp://localhost:1935/live"
 active_streams = {}
 
 
+def fetch_score(stream_name, stop_event):
+    print("Fetching score")
+    match_id = stream_name
+    while not stop_event.is_set():
+        print("calling get_score_websocket_and_get_image")
+        get_score_websocket_and_get_image(match_id)
+
 def stream_to_youtube(stream_name, youtube_url, stop_event):
     input_url = f"{RTMP_SERVER}/{stream_name}"
     print(input_url)
@@ -85,13 +92,8 @@ def start_stream():
         return jsonify({'error': 'Stream already active'}), 409
     
     
-    def fetch_score():
-        print("Fetching score")
-        match_id = stream_name
-        while not stop_event.is_set():
-            print("calling get_score_websocket_and_get_image")
-            get_score_websocket_and_get_image(match_id)
-    score_thread = threading.Thread(target=fetch_score)
+    stop_event_score = threading.Event()
+    score_thread = threading.Thread(target=fetch_score, args=(stream_name, stop_event_score))
     score_thread.start()
     
 

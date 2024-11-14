@@ -62,6 +62,7 @@ def get_score_websocket_and_get_image(match_id):
         
         
 async def main(match_id):
+    print("in the main function")
     # Example usage
     base_url = "https://qa.gully6.com"
     guest_user_id = "your_guest_id"  # Replace with your guest ID
