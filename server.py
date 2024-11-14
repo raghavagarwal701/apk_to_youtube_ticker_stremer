@@ -19,12 +19,12 @@ active_streams = {}
 def stream_to_youtube(stream_name, youtube_url, stop_event):
     input_url = f"{RTMP_SERVER}/{stream_name}"
     print(input_url)
+    img = Image.open('score_image.png')
+    img.save(f"{stream_name}.png")
 
     while not stop_event.is_set():
         # Generate the overlay image
-        img = Image.open('score_image.png')
         overlay_image = f"{stream_name}.png"
-        img.save(overlay_image)
 
         ffmpeg_command = [
             'ffmpeg',
@@ -41,10 +41,10 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
         process_ffmpeg = subprocess.Popen(ffmpeg_command)
 
         # Start a separate thread or process for the score fetching
-        def fetch_score():
+        async def fetch_score():
             match_id = stream_name
             while not stop_event.is_set():
-                get_score_websocket_and_get_image(match_id)
+                await get_score_websocket_and_get_image(match_id)
 
         score_thread = threading.Thread(target=fetch_score)
         score_thread.start()
@@ -67,9 +67,6 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
 
     print(f"Stream {stream_name} stopped")
 
-def main(stream_name):
-    match_id = stream_name
-    get_score_websocket_and_get_image(match_id)
     # print(score)
 
     # Open the sample image

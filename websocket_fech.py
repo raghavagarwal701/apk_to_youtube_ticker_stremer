@@ -3,6 +3,8 @@ import asyncio
 import json
 from image_generator import generate_image
 
+
+
 class SimpleMatchClient:
     def __init__(self, base_url: str, match_id: str, guest_user_id: str):
 
@@ -47,28 +49,10 @@ class SimpleMatchClient:
         # with open("match_data.json", "w") as f:
         #     json.dump(data, f, indent=2)
 
-async def main():
-    # Example usage
-    base_url = "https://qa.gully6.com"
-    match_id = input("Enter match ID: ") 
-    guest_user_id = "your_guest_id"  # Replace with your guest ID
 
-    client = SimpleMatchClient(base_url, match_id, guest_user_id)
-    
-    try:
-        await client.connect()
-        # Keep connection alive
-        await asyncio.sleep(7200)  # Run for 1 hour
-    except KeyboardInterrupt:
-        print("\nShutting down...")
-    finally:
-        await client.disconnect()
 
-if __name__ == "__main__":
-    asyncio.run(main())
-    
-    
-    
+
+
 async def get_score_websocket_and_get_image(match_id):
     base_url = "https://qa.gully6.com"
     guest_user_id = "your_guest_id"  # Replace with your guest ID
@@ -88,6 +72,34 @@ async def get_score_websocket_and_get_image(match_id):
     with open("match_data.json", "r") as f:
         data = json.load(f)
         
+        
+        
+        
+        
+async def main():
+    # Example usage
+    # base_url = "https://qa.gully6.com"
+    # match_id = input("Enter match ID: ") 
+    # guest_user_id = "your_guest_id"  # Replace with your guest ID
+
+    # client = SimpleMatchClient(base_url, match_id, guest_user_id)
+    
+    # try:
+    #     await client.connect()
+    #     # Keep connection alive
+    #     await asyncio.sleep(7200)  # Run for 1 hour
+    # except KeyboardInterrupt:
+    #     print("\nShutting down...")
+    # finally:
+    #     await client.disconnect()
+    await get_score_websocket_and_get_image("ilim6xty3")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+    
+    
+    
+
     
     # Return the image path
     # return f"{match_id}.png"
