@@ -30,7 +30,7 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
             'ffmpeg',
             '-i', input_url,
             '-i', overlay_image,
-            '-filter_complex', '[0:v]transpose=2[v];[v][1:v]overlay=335:990',
+            '-filter_complex', '[0:v]transpose=2[v];[v][1:v]overlay=15:620',
             '-c:v', 'libx264',
             '-c:a', 'aac',
             '-strict', 'experimental',
