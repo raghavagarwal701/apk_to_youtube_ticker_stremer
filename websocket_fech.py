@@ -43,7 +43,7 @@ class SimpleMatchClient:
 
     async def on_match_update(self, data):
         """Handle match updates."""
-        print(f"Match update received: {json.dumps(data, indent=2)}")
+        # print(f"Match update received: {json.dumps(data, indent=2)}")
         
         generate_image(data, self.match_id)
         # store this data in a file
