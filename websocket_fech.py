@@ -90,4 +90,4 @@ async def get_score_websocket_and_get_image(match_id):
         
     
     # Return the image path
-    return f"{match_id}.png"
+    # return f"{match_id}.png"
