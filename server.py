@@ -41,13 +41,15 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
         
     while not stop_event.is_set():
         # Generate the overlay image
+        img = Image.open(f"{stream_name}.png")
+        img.save(f"{stream_name}.png")
         overlay_image = f"{stream_name}.png"
 
         ffmpeg_command = [
             'ffmpeg',
             '-i', input_url,
             '-i', overlay_image,
-            '-filter_complex', '[0:v]transpose=2[v];[v][1:v]overlay=15:620:shortest=1:loop=1',
+            '-filter_complex', '[0:v]transpose=2[v];[v][1:v]overlay=15:620',
             '-c:v', 'libx264',
             '-c:a', 'aac',
             '-strict', 'experimental',
