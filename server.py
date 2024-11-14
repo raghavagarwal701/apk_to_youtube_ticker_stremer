@@ -23,9 +23,11 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
     img.save(f"{stream_name}.png")
     
     async def fetch_score():
-            match_id = stream_name
-            while not stop_event.is_set():
-                await get_score_websocket_and_get_image(match_id)
+        print("Fetching score")
+        match_id = stream_name
+        while not stop_event.is_set():
+            print("calling get_score_websocket_and_get_image")
+            await get_score_websocket_and_get_image(match_id)
 
     score_thread = threading.Thread(target=fetch_score)
     score_thread.start()

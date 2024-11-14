@@ -43,7 +43,8 @@ class SimpleMatchClient:
 
     async def on_match_update(self, data):
         """Handle match updates."""
-        # print(f"Match update received: {json.dumps(data, indent=2)}")
+        print(f"Match update received: {json.dumps(data, indent=2)}")
+        
         generate_image(data, self.match_id)
         # store this data in a file
         # with open("match_data.json", "w") as f:
@@ -54,6 +55,7 @@ class SimpleMatchClient:
 
 
 async def get_score_websocket_and_get_image(match_id):
+    print("here")
     base_url = "https://qa.gully6.com"
     guest_user_id = "your_guest_id"  # Replace with your guest ID
 
