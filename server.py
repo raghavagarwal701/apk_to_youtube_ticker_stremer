@@ -26,8 +26,8 @@ def fetch_score(stream_name, stop_event):
 def stream_to_youtube(stream_name, youtube_url, stop_event):
     input_url = f"{RTMP_SERVER}/{stream_name}"
     print(input_url)
-    # img = Image.open('score_image.png')
-    # img.save(f"{stream_name}.png")
+    img = Image.open('score_image.png')
+    img.save(f"{stream_name}.png")
     
     async def fetch_score():
         print("Fetching score")
