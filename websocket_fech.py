@@ -79,7 +79,8 @@ async def main(match_id):
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    match_id = input("Enter the match id: ")
+    asyncio.run(main(match_id))
     
     
     
