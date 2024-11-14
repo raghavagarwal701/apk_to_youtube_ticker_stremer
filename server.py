@@ -77,8 +77,8 @@ def start_stream():
         return jsonify({'error': 'Stream already active'}), 409
     
     
-    img = Image.open('score_image.png')
-    img.save(f"{stream_name}.png")
+    # img = Image.open('score_image.png')
+    # img.save(f"{stream_name}.png")
     
     stop_event_score = threading.Event()
     score_thread = threading.Thread(target=fetch_score, args=(stream_name, stop_event_score))
