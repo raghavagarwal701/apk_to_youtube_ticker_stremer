@@ -34,7 +34,7 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
         ffmpeg_command = [
             'ffmpeg',
             '-i', input_url,
-            '-i', overlay_image,
+            '-i', f"{overlay_image}:update=1",
             '-filter_complex', '[0:v]transpose=2[v];[v][1:v]overlay=15:620',
             '-c:v', 'libx264',
             '-c:a', 'aac',
@@ -77,8 +77,8 @@ def start_stream():
         return jsonify({'error': 'Stream already active'}), 409
     
     
-    # img = Image.open('score_image.png')
-    # img.save(f"{stream_name}.png")
+    img = Image.open('score_image.png')
+    img.save(f"{stream_name}.png")
     
     stop_event_score = threading.Event()
     score_thread = threading.Thread(target=fetch_score, args=(stream_name, stop_event_score))
