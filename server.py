@@ -43,9 +43,9 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
             if process.poll() is not None:
                 print(f"FFmpeg process for stream {stream_name} has ended unexpectedly.")
                 break
-            main(stream_name)
+            # main(stream_name)
             overlay_image = f"{stream_name}.png"
-            time.sleep(1)  # Wait for 1 second before generating the next overlay image
+            time.sleep(100)  # Wait for 1 second before generating the next overlay image
 
         if process.poll() is None:
             process.terminate()
@@ -56,7 +56,7 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
 def main(stream_name):
     match_id = stream_name
     score = get_score_websocket_and_get_image(match_id)
-    print(score)
+    # print(score)
 
     # Open the sample image
     # img = Image.open('score_image.png')
