@@ -53,9 +53,9 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
 
     print(f"Stream {stream_name} stopped")
 
-def main(stream_name):
+async def main(stream_name):
     match_id = stream_name
-    score = get_score_websocket_and_get_image(match_id)
+    await score = get_score_websocket_and_get_image(match_id)
     # print(score)
 
     # Open the sample image
