@@ -80,6 +80,12 @@ def generate_image(json_data, match_id):
         # Add the text to the image at the specified position with the specified color
         draw.text(element["position"], element["text"], font=font, fill=element["color"])
 
-    save_path = (match_id+'.png')
+    save_path = f"{match_id}.png"
+
+    if os.path.exists(save_path):
+        os.remove(save_path)
+        print(f"Existing image {save_path} deleted.")
+
     img.save(save_path)
     print(f"Image saved as {save_path}")
+
