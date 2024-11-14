@@ -22,7 +22,9 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
 
     while not stop_event.is_set():
         # Generate the overlay image
+        img = Image.open(('score_image.png'))
         overlay_image = f"{stream_name}.png"
+        img.save(overlay_image)
 
         ffmpeg_command = [
             'ffmpeg',
