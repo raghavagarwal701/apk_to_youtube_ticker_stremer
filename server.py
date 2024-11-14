@@ -65,7 +65,7 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
 
             # Wait and generate the next overlay image (if needed)
             overlay_image = f"{stream_name}.png"
-            time.sleep(100)  # Wait for 1 second before generating the next overlay image
+            time.sleep(1)  # Wait for 1 second before generating the next overlay image
 
         # Clean up when the stream is stopped
         if process_ffmpeg.poll() is None:
