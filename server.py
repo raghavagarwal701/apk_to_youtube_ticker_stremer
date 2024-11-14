@@ -26,23 +26,9 @@ def fetch_score(stream_name, stop_event):
 def stream_to_youtube(stream_name, youtube_url, stop_event):
     input_url = f"{RTMP_SERVER}/{stream_name}"
     print(input_url)
-    img = Image.open('score_image.png')
-    img.save(f"{stream_name}.png")
-    
-    async def fetch_score():
-        print("Fetching score")
-        match_id = stream_name
-        while not stop_event.is_set():
-            print("calling get_score_websocket_and_get_image")
-            await get_score_websocket_and_get_image(match_id)
-
-    score_thread = threading.Thread(target=fetch_score)
-    score_thread.start()
         
     while not stop_event.is_set():
         # Generate the overlay image
-        img = Image.open(f"{stream_name}.png")
-        img.save(f"{stream_name}.png")
         overlay_image = f"{stream_name}.png"
 
         ffmpeg_command = [
@@ -64,17 +50,14 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
             if process_ffmpeg.poll() is not None:
                 print(f"FFmpeg process for stream {stream_name} has ended unexpectedly.")
                 break
-
             # Wait and generate the next overlay image (if needed)
             overlay_image = f"{stream_name}.png"
-            time.sleep(1)  # Wait for 1 second before generating the next overlay image
-
+            
         # Clean up when the stream is stopped
         if process_ffmpeg.poll() is None:
             process_ffmpeg.terminate()
             process_ffmpeg.wait()
 
-        score_thread.join()  # Ensure the score-fetching thread finishes
 
     print(f"Stream {stream_name} stopped")
 
@@ -93,6 +76,9 @@ def start_stream():
     if stream_name in active_streams:
         return jsonify({'error': 'Stream already active'}), 409
     
+    
+    img = Image.open('score_image.png')
+    img.save(f"{stream_name}.png")
     
     stop_event_score = threading.Event()
     score_thread = threading.Thread(target=fetch_score, args=(stream_name, stop_event_score))
