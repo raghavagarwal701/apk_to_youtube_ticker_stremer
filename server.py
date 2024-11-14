@@ -33,8 +33,9 @@ def stream_to_youtube(stream_name, youtube_url, stop_event):
 
         ffmpeg_command = [
             'ffmpeg',
-            '-i', input_url,
-            '-i', f"{overlay_image}:update=1",
+            '-re', '-i', input_url,
+            '-f', 'image2', '-loop', '1',       # Options for the overlay image
+            '-i', f"{stream_name}.png",         # Overlay image file
             '-filter_complex', '[0:v]transpose=2[v];[v][1:v]overlay=15:620',
             '-c:v', 'libx264',
             '-c:a', 'aac',
