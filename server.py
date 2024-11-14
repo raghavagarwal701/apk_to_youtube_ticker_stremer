@@ -6,6 +6,7 @@ from score_fetch import fetch_match_data
 from websocket_fech import get_score_websocket_and_get_image
 from PIL import Image, ImageDraw, ImageFont
 import time
+import asyncio
 
 app = Flask(__name__)
 
@@ -15,15 +16,13 @@ RTMP_SERVER = "rtmp://localhost:1935/live"
 # Dictionary to keep track of active streams
 active_streams = {}
 
-
 async def stream_to_youtube(stream_name, youtube_url, stop_event):
     input_url = f"{RTMP_SERVER}/{stream_name}"
-    print(input_url)
+    print(f"Input URL: {input_url}")
 
     while not stop_event.is_set():
-        # Generate the overlay image
+        # Start FFmpeg stream to YouTube
         overlay_image = f"{stream_name}.png"
-
         ffmpeg_command = [
             'ffmpeg',
             '-i', input_url,
@@ -37,20 +36,28 @@ async def stream_to_youtube(stream_name, youtube_url, stop_event):
         ]
 
         process = subprocess.Popen(ffmpeg_command)
-        await main(stream_name)
+        print(f"Started FFmpeg process for stream: {stream_name}")
+
+        # Start WebSocket function in background (async)
+        task = asyncio.create_task(main(stream_name))
+
         while not stop_event.is_set():
             if process.poll() is not None:
                 print(f"FFmpeg process for stream {stream_name} has ended unexpectedly.")
                 break
-            # main(stream_name)
-            overlay_image = f"{stream_name}.png"
-            time.sleep(100)  # Wait for 1 second before generating the next overlay image
+            
+            time.sleep(1)  # Sleep to simulate image refresh or control the loop
 
+        # Ensure process is terminated properly
         if process.poll() is None:
             process.terminate()
             process.wait()
 
+        # Wait for the background WebSocket task to finish (if needed)
+        await task
+
     print(f"Stream {stream_name} stopped")
+
 
 async def main(stream_name):
     match_id = stream_name
