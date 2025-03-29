@@ -37,19 +37,27 @@ def start_match_monitoring(stream_id, overlay_id="0"):
         return False
 
 def update_overlay_image(stream_id, stop_event, update_interval=1):
-    """Download the overlay image periodically"""
-    local_path = f"{stream_id}.png"
+    """Download the overlay image periodically using a double-buffer approach"""
+    main_path = f"{stream_id}.png"
+    buffer_path = f"buffer/{stream_id}_temp.png"
     image_url = f"{OVERLAY_IMAGE_BASE}/{stream_id}.png"
+    
+    # Ensure buffer directory exists
+    os.makedirs('buffer', exist_ok=True)
     
     while not stop_event.is_set():
         try:
-            # Download the current image
+            # Download to temp location first
             response = requests.get(image_url)
             if response.status_code == 200:
-                # Save the new image
-                with open(local_path, 'wb') as f:
+                # Save to buffer first
+                with open(buffer_path, 'wb') as f:
                     f.write(response.content)
-                # print(f"Updated overlay image for {stream_id}")
+                
+                # Then safely move to the main location
+                # This is an atomic operation on most filesystems
+                os.replace(buffer_path, main_path)
+                
             else:
                 print(f"Failed to get overlay image: {response.status_code}")
                 
@@ -59,13 +67,14 @@ def update_overlay_image(stream_id, stop_event, update_interval=1):
         # Wait for the specified interval before updating again
         time.sleep(update_interval)
     
-    # Clean up the image file when stopped
-    if os.path.exists(local_path):
-        try:
-            os.remove(local_path)
-            print(f"Removed overlay image file for {stream_id}")
-        except:
-            pass
+    # Clean up the image files when stopped
+    for path in [main_path, buffer_path]:
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+                print(f"Removed overlay image file: {path}")
+            except:
+                pass
 
 def stream_to_youtube(stream_id, youtube_url, stop_event):
     input_url = f"{RTMP_SERVER}/{stream_id}"
@@ -73,21 +82,27 @@ def stream_to_youtube(stream_id, youtube_url, stop_event):
     
     overlay_image = f"{stream_id}.png"
     
-    # Start FFmpeg process
+    # Start FFmpeg process with improved overlay handling
     ffmpeg_command = [
         'ffmpeg',
         '-re', '-i', input_url,
-        '-f', 'image2', '-loop', '1',       # Options for the overlay image
-        '-i', overlay_image,                 # Overlay image file
-        '-filter_complex', '[0:v]transpose=2[v];[v][1:v]overlay=15:620',
-        '-c:v', 'libx264',
-        '-c:a', 'aac',
-        '-strict', 'experimental',
+        '-analyzeduration', '10M', '-probesize', '10M',  # Better file analysis
+        '-loop', '1',                    # Loop the image
+        '-i', overlay_image,             # Overlay image file
+        '-filter_complex', '[0:v]transpose=2[v];[v][1:v]overlay=15:620:format=auto:eof_action=pass',
+        '-c:v', 'libx264', '-preset', 'ultrafast', '-b:v', '1000k',
+        '-c:a', 'aac', '-ar', '44100',
+        '-shortest', '-fflags', '+shortest',
+        '-avoid_negative_ts', 'make_zero',
         '-f', 'flv',
         youtube_url
     ]
 
-    process_ffmpeg = subprocess.Popen(ffmpeg_command)
+    # Create a buffer directory for the overlay image
+    os.makedirs('buffer', exist_ok=True)
+    
+    # Start FFmpeg as subprocess
+    process_ffmpeg = subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
     # Monitor the process
     while not stop_event.is_set():
